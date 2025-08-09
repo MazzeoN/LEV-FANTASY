@@ -12,25 +12,32 @@ import {
   borrarParticipanteCommandData,
 } from "./borrarParticipante";
 
+const { DISCORD_TOKEN, DISCORD_CLIENT_ID, DISCORD_GUILD_ID } = process.env;
+
+if (!DISCORD_TOKEN || !DISCORD_CLIENT_ID || !DISCORD_GUILD_ID) {
+  console.error("❌ Faltan variables de entorno requeridas (DISCORD_TOKEN, DISCORD_CLIENT_ID, DISCORD_GUILD_ID).");
+  process.exit(1);
+}
+
 const commands = [
   enviarDinamicaCommandData,
   exportarParticipantesCommandData,
   borrarParticipanteCommandData,
 ];
 
-const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN!);
+const rest = new REST({ version: "10" }).setToken(DISCORD_TOKEN);
 
 async function reset() {
   try {
     console.log("🧹 Borrando comandos anteriores...");
     await rest.put(
-      Routes.applicationGuildCommands(process.env.CLIENT_ID!, process.env.GUILD_ID!),
+      Routes.applicationGuildCommands(DISCORD_CLIENT_ID, DISCORD_GUILD_ID),
       { body: [] }
     );
 
     console.log("✅ Registrando nuevos comandos...");
     await rest.put(
-      Routes.applicationGuildCommands(process.env.CLIENT_ID!, process.env.GUILD_ID!),
+      Routes.applicationGuildCommands(DISCORD_CLIENT_ID, DISCORD_GUILD_ID),
       { body: commands }
     );
 
